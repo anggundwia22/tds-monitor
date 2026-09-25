@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TDS Monitoring</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="topbar">
+      <div class="brand">
+        <p class="eyebrow">ESP32</p>
+        <h1>TDS Monitoring</h1>
+      </div>
+      <p class="clock" id="datetime">--</p>
+    </div>
+    <nav>
+      <button type="button" class="nav active" data-page="dashboard">Dashboard</button>
+      <button type="button" class="nav" data-page="settings">Settings</button>
+      <button type="button" class="nav" data-page="data">Data</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="dashboard" class="page visible">
+      <article class="hero">
+        <p class="label">TDS</p>
+        <p class="value"><span id="tds">--</span> <small>ppm</small></p>
+      </article>
+      <article class="card">
+        <p class="label">Temperature</p>
+        <p class="value mid"><span id="temp">--</span> <small>°C</small></p>
+      </article>
+      <ul class="status" id="statusList">
+        <li><span class="dot"></span> RTC: <strong id="stRtc">--</strong></li>
+        <li><span class="dot"></span> DS18B20: <strong id="stDs">--</strong></li>
+        <li><span class="dot"></span> TDS: <strong id="stTds">--</strong></li>
+      </ul>
+    </section>
+
+    <section id="settings" class="page">
+      <form id="intervalForm" class="card form">
+        <h2>Intervals</h2>
+        <label for="measure">Measurement Interval (seconds)</label>
+        <input id="measure" name="measure" type="number" min="1" max="86400" step="1" required>
+        <label for="log">Log Interval (seconds)</label>
+        <input id="log" name="log" type="number" min="1" max="86400" step="1" required>
+        <button type="submit" class="primary">Save Settings</button>
+        <p id="intervalMsg" class="msg"></p>
+      </form>
+
+      <form id="rtcForm" class="card form">
+        <h2>RTC Setting</h2>
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date" required>
+        <label for="time">Time</label>
+        <input id="time" name="time" type="time" step="1" required>
+        <button type="submit" class="primary">Set RTC</button>
+        <p id="rtcMsg" class="msg"></p>
+      </form>
+
+      <div class="restart-wrap">
+        <button type="button" id="restartBtn" class="primary">Restart Device</button>
+        <p id="restartMsg" class="msg"></p>
+      </div>
+    </section>
+
+    <section id="data" class="page">
+      <article class="card">
+        <h2>Data</h2>
+        <dl>
+          <div><dt>Total Data</dt><dd id="dataCount">--</dd></div>
+          <div><dt>File Size</dt><dd id="dataSize">--</dd></div>
+          <div><dt>LittleFS</dt><dd id="dataFs">--</dd></div>
+        </dl>
+        <div class="actions">
+          <a class="button primary" href="/api/data/download">Download</a>
+          <button type="button" id="deleteBtn" class="danger">Delete</button>
+        </div>
+        <p id="dataMsg" class="msg"></p>
+      </article>
+    </section>
+  </main>
+  <script src="/script.js"></script>
+</body>
+</html>
