@@ -226,7 +226,8 @@ uint32_t medianMillis(uint32_t *values, int count) {
 float readTDS(float temperature) {
   uint32_t samples[TDS_SAMPLES];
   for (int i = 0; i < TDS_SAMPLES; i++) {
-    samples[i] = analogReadMilliVolts(TDS_PIN);
+    // samples[i] = analogReadMilliVolts(TDS_PIN);
+    samples[i] = analogRead(TDS_PIN);
   }
   float voltage = medianMillis(samples, TDS_SAMPLES) / 1000.0f;
 
