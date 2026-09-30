@@ -21,9 +21,12 @@
 
 // DFRobot Gravity TDS Meter V1.0 (SEN0244):
 // Analog output is 0–2.3 V. The cubic polynomial below is the vendor formula.
-// UNO examples divide ADC counts by 1024 (10-bit). This board is 12-bit, so
-// voltage comes from analogReadMilliVolts() (eFuse calibration) instead.
+// UNO examples use analogRead() * 5.0 / 1024 (10-bit ADC, 5 V reference).
+// This board is 12-bit with ADC_11db, full scale about 3.3 V, so the same
+// step is analogRead() * 3.3 / 4096.
 // The trailing 0.5 is the vendor default calibration coefficient (kValue).
+static const float TDS_VREF = 3.3f;
+static const float TDS_ADC_SCALE = 4096.0f;
 static const float TDS_KVALUE = 0.5f;
 static const float TDS_VMAX = 2.40f;
 static const int TDS_SAMPLES = 30;
@@ -226,10 +229,9 @@ uint32_t medianMillis(uint32_t *values, int count) {
 float readTDS(float temperature) {
   uint32_t samples[TDS_SAMPLES];
   for (int i = 0; i < TDS_SAMPLES; i++) {
-    // samples[i] = analogReadMilliVolts(TDS_PIN);
     samples[i] = analogRead(TDS_PIN);
   }
-  float voltage = medianMillis(samples, TDS_SAMPLES) / 1000.0f;
+  float voltage = medianMillis(samples, TDS_SAMPLES) * (TDS_VREF / TDS_ADC_SCALE);
 
   if (voltage < 0.0f || voltage > TDS_VMAX) {
     tdsOk = false;
