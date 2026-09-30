@@ -8,6 +8,7 @@
 #include <RTClib.h>
 #include <ArduinoJson.h>
 #include <math.h>
+#include <esp_task_wdt.h>
 
 // ---------------------------------------------------------------------------
 // Pin map — ESP32 DOIT DevKit V1
@@ -43,6 +44,7 @@ static const uint32_t DEFAULT_MEASURE_MS = 10000;
 static const uint32_t DEFAULT_LOG_MS = 60000;
 static const uint32_t MIN_INTERVAL_MS = 1000;
 static const uint32_t MAX_INTERVAL_MS = 86400000UL;
+static const uint32_t WDT_TIMEOUT_S = 20;
 
 WebServer server(80);
 OneWire oneWire(DS18B20_PIN);
@@ -619,6 +621,31 @@ void setupServer() {
   server.begin();
 }
 
+void startWatchdog() {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+  esp_task_wdt_config_t cfg = {};
+  cfg.timeout_ms = WDT_TIMEOUT_S * 1000UL;
+  cfg.idle_core_mask = 0;
+  cfg.trigger_panic = true;
+  esp_err_t cfgErr = esp_task_wdt_reconfigure(&cfg);
+  if (cfgErr != ESP_OK) {
+    cfgErr = esp_task_wdt_init(&cfg);
+  }
+#else
+  esp_err_t cfgErr = esp_task_wdt_init(WDT_TIMEOUT_S, true);
+#endif
+  esp_err_t addErr = esp_task_wdt_add(NULL);
+  if (addErr == ESP_ERR_INVALID_ARG || addErr == ESP_ERR_INVALID_STATE) {
+    addErr = ESP_OK;
+  }
+  if (cfgErr == ESP_OK && addErr == ESP_OK) {
+    esp_task_wdt_reset();
+    Serial.printf("Watchdog %u s\n", WDT_TIMEOUT_S);
+  } else {
+    Serial.printf("Watchdog setup failed cfg=%d add=%d\n", static_cast<int>(cfgErr), static_cast<int>(addErr));
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   delay(200);
@@ -668,9 +695,11 @@ void setup() {
   setupServer();
   lastLogAt = millis();
   startMeasurement();
+  startWatchdog();
 }
 
 void loop() {
+  esp_task_wdt_reset();
   server.handleClient();
   if (!rtcOk && millis() - lastRtcProbeAt >= 5000) {
     lastRtcProbeAt = millis();
