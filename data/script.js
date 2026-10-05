@@ -53,10 +53,12 @@ async function refreshDashboard() {
     ]);
     document.getElementById("tds").textContent = sensor.tds == null ? "--" : sensor.tds;
     document.getElementById("temp").textContent = sensor.temperature == null ? "--" : sensor.temperature;
+    document.getElementById("ph").textContent = sensor.ph == null ? "--" : sensor.ph;
     document.getElementById("datetime").textContent = sensor.datetime || "--";
     mark("stRtc", status.rtcLostPower && status.rtc === "connected" ? "connected, time not set" : status.rtc);
     mark("stDs", status.ds18b20);
     mark("stTds", status.tds);
+    mark("stPh", status.ph);
   } catch (err) {
     document.getElementById("datetime").textContent = "offline";
   }
