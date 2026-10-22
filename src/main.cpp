@@ -34,7 +34,7 @@ static const int TDS_SAMPLES = 30;
 static const uint32_t DS18B20_CONV_MS = 800;
 
 static const char *AP_SSID = "TDS-Monitor";
-static const char *AP_PASSWORD = "12345678";
+static const char *AP_PASSWORD = "sulungresearch";
 
 static const char *CONFIG_PATH = "/config.json";
 static const char *DATA_PATH = "/data.csv";
